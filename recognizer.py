@@ -60,11 +60,10 @@ if __name__ == "__main__":
     print(f"Testing speech recognition for ukrainian wia google")
     print(f"You said: {recognizer.recognize_google(recognizer.listen())}")
     del recognizer
-    recognizer = Recognizer("./models/recognizer/en-us")
+    recognizer = Recognizer("./models/en-us")
     print(f"Testing speech recognition for english wia vosk")
     print(f"You said: {recognizer.recognize_vosk(recognizer.listen())}")
     del recognizer
-    recognizer = Recognizer("./models/recognizer/uk-ua", language="uk-UA")
-    print(f"Testing speech recognition for ukrainian wia vosk")
+    print("Testing speech recognition for ukrainian wia vosk")
+    recognizer = Recognizer("./models/uk-ua", language="uk-UA")
     print(f"You said: {recognizer.recognize_vosk(recognizer.listen())}")
-

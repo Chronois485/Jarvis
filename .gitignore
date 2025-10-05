@@ -1,4 +1,5 @@
-./.venv/
+./.venv/*
 ./*.wav
 ./*.mp3
-./__pycache__/
+./__pycache__/*
+./models/*
