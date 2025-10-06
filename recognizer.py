@@ -18,12 +18,12 @@ class Recognizer:
             self.model = Model(model_path)
             self.recognizer_vosk = KaldiRecognizer(self.model, 16000)
 
-    def listen(self):
+    def listen(self) -> sr.AudioData | None:
         with sr.Microphone() as source:
             auido = self.recognizer_google.listen(source)
-        return auido
+        return auido if type(auido) == sr.AudioData else None
 
-    def recognize_google(self, audio) -> str:
+    def recognize_google(self, audio: sr.AudioData) -> str:
         try:
             text: str = self.recognizer_google.recognize_google(audio, language=self.language)  # type: ignore
             return text
@@ -32,38 +32,20 @@ class Recognizer:
         except sr.RequestError as e:
             return str(e)
 
-    def recognize_vosk(self, audio) -> str:
+    def recognize_vosk(self, audio: sr.AudioData) -> str:
         if self.model:
             data: bytes = convert_audio_data_to_raw(audio)
-            if self.recognizer_vosk.AcceptWaveform(data):
-                result = json.loads(self.recognizer_vosk.Result())
-            else:
-                result = json.loads(self.recognizer_vosk.FinalResult())
+            if self.recognizer_vosk.AcceptWaveform(data): result = json.loads(self.recognizer_vosk.Result())
+            else: result = json.loads(self.recognizer_vosk.FinalResult())
             return result.get("text", "")
         else:
             return ""
 
     def recognize(self, audio) -> str:
+        if not audio:
+            return ""
         return (
             self.recognize_google(audio)
             if is_connected_to_internet()
             else self.recognize_vosk(audio)
         )
-
-
-if __name__ == "__main__":
-    recognizer = Recognizer()
-    print(f"Testing speech recognition for english wia google")
-    print(f"You said: {recognizer.recognize_google(recognizer.listen())}")
-    del recognizer
-    recognizer = Recognizer(language="uk-UA")
-    print(f"Testing speech recognition for ukrainian wia google")
-    print(f"You said: {recognizer.recognize_google(recognizer.listen())}")
-    del recognizer
-    recognizer = Recognizer("./models/en-us")
-    print(f"Testing speech recognition for english wia vosk")
-    print(f"You said: {recognizer.recognize_vosk(recognizer.listen())}")
-    del recognizer
-    print("Testing speech recognition for ukrainian wia vosk")
-    recognizer = Recognizer("./models/uk-ua", language="uk-UA")
-    print(f"You said: {recognizer.recognize_vosk(recognizer.listen())}")
