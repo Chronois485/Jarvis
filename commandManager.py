@@ -14,7 +14,7 @@ class CommandManager:
         for key, value in self.commands_table.items():
             variants: list = key.split(",")
             for vatiant in variants:
-                tmp_key: str = ""
+                key_command: str = ""
                 if ">" in vatiant:
                     key_command = vatiant.split(">")[0]
                     command, user_input = (
@@ -22,11 +22,11 @@ class CommandManager:
                         command[len(key_command) :],
                     )
 
-                    if tmp_key in command:
+                    if key_command in command:
                         return value.replace(">", user_input)
                 else:
-                    tmp_key = vatiant
-                    if tmp_key == command:
+                    key_command = vatiant
+                    if key_command == command:
                         return value
         return ""
 
@@ -39,25 +39,11 @@ class CommandManager:
                 self.internet_manager.open_link(
                     f"https://www.google.com/search?q={command_with_input[1].replace(" ", "+")}"
                 )
-                return
+                return "Відкриваю"
         else:
             if command == "WHAT_DATE":
                 return f"Сьогодні {get_date()}"
             elif command == "WHAT_TIME":
                 return f"Зараз {get_time()}"
-
-
-if __name__ == "__main__":
-    manager = CommandManager("./commands.json")
-
-    print(manager.determine_command("яке число"))
-    print(manager.determine_command("дата"))
-    print(manager.determine_command("котра година"))
-    print(manager.determine_command("година"))
-    print(manager.determine_command("час"))
-    find_test = manager.determine_command("знайди парабола")
-    print(manager.determine_command("пошукай парабола"))
-    print(find_test)
-    manager.run_command(find_test)
-    print(manager.run_command("WHAT_TIME"))
-    print(manager.run_command("WHAT_DATE"))
+            elif command == "EXIT":
+                return f"До побачення"
