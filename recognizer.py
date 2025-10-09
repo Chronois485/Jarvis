@@ -1,11 +1,12 @@
 import json
 import os
+from re import I
 
 import speech_recognition as sr
 from vosk import KaldiRecognizer, Model
 
-from checkConnection import is_connected_to_internet
 from conventor import convert_audio_data_to_raw
+from internetManager import InternetManager
 
 
 class Recognizer:
@@ -14,6 +15,7 @@ class Recognizer:
         self.language: str = language
         self.language_vosk: str = self.language[:2]
         self.model = None
+        self.internet_manager: InternetManager = InternetManager()
         if model_path and os.path.exists(model_path):
             self.model = Model(model_path)
             self.recognizer_vosk = KaldiRecognizer(self.model, 16000)
@@ -35,8 +37,10 @@ class Recognizer:
     def recognize_vosk(self, audio: sr.AudioData) -> str:
         if self.model:
             data: bytes = convert_audio_data_to_raw(audio)
-            if self.recognizer_vosk.AcceptWaveform(data): result = json.loads(self.recognizer_vosk.Result())
-            else: result = json.loads(self.recognizer_vosk.FinalResult())
+            if self.recognizer_vosk.AcceptWaveform(data):
+                result = json.loads(self.recognizer_vosk.Result())
+            else:
+                result = json.loads(self.recognizer_vosk.FinalResult())
             return result.get("text", "")
         else:
             return ""
@@ -46,6 +50,6 @@ class Recognizer:
             return ""
         return (
             self.recognize_google(audio)
-            if is_connected_to_internet()
+            if self.internet_manager.is_connected_to_internet()
             else self.recognize_vosk(audio)
         )
