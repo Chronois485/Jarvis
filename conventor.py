@@ -1,5 +1,6 @@
 import speech_recognition as sr
+import constants as const
 
 
 def convert_audio_data_to_raw(audio_data: sr.AudioData) -> bytes:
-    return audio_data.get_raw_data(convert_rate=16000, convert_width=2)
+    return audio_data.get_raw_data(convert_rate=const.AUDIO_RATE, convert_width=const.AUDIO_WIDTH)

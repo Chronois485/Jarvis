@@ -1,6 +1,8 @@
 import pyttsx3
 import requests
 
+import constants as const
+
 from checkConnection import is_connected_to_internet
 
 
@@ -10,7 +12,7 @@ class TTSEngine:
         self.online: bool = is_connected_to_internet()
         self.engine: pyttsx3.Engine = pyttsx3.init()
         voices: object = self.engine.getProperty("voices")
-        for voice in voices: # type: ignore
+        for voice in voices:  # type: ignore
             if not self.language in voice.languages[0]: continue
             self.engine.setProperty("voice", voice.id)
             break
@@ -29,7 +31,6 @@ class TTSEngine:
         return output_file
 
     def tts_google(self, text: str, output_file: str) -> None:
-        url: str = "https://translate.google.com/translate_tts"
         params: dict = {
             "ie": "UTF-8",
             "q": text,
@@ -37,7 +38,7 @@ class TTSEngine:
             "client": "tw-ob",
         }
         headers: dict = {"User-Agent": "Mozilla/5.0"}
-        response = requests.get(url, params=params, headers=headers)
+        response = requests.get(const.GOOGLE_TTS, params=params, headers=headers)
         if response.status_code != 200:
             raise Exception("Online TTS failed")
         with open(output_file, "wb") as f:

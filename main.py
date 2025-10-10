@@ -1,6 +1,7 @@
 from rich.console import Console
 from rich.markdown import Markdown
 
+import constants as const
 from recognizer import Recognizer
 from soundPlayer import SoundPlayer
 from ttsEngine import TTSEngine
@@ -12,13 +13,15 @@ print()
 console.print(Markdown("# Starting"))
 
 console.print("[dim]Initialization of main components[/dim]")
-command_manager: CommandManager = CommandManager("./commands.json")
-recognizer_en: Recognizer = Recognizer("./models/en-us", language="en-US")
-recognizer_ua: Recognizer = Recognizer("./models/uk-ua", language="uk-UA")
+command_manager: CommandManager = CommandManager(const.COMMANDS)
+recognizer_en: Recognizer = Recognizer(const.RecognitionModels.EN.value, language=const.Languages.ENGLISH.value)
+recognizer_ua: Recognizer = Recognizer(const.RecognitionModels.UK.value, language=const.Languages.UKRAINIAN.value)
 tts_engine: TTSEngine = TTSEngine(lang="uk")
 sound_player: SoundPlayer = SoundPlayer()
 running: bool = True
 console.print("[dim green]Initialization completed[/dim green]")
+console.print("[dim]Loading settings[/dim]")
+
 console.print("[bold blue]Starting main loop[/bold blue]")
 
 print()
@@ -38,7 +41,7 @@ while running:
     answer = command_manager.run_command(command)
     if not answer:
         continue
-    if answer.lower() == "до побачення": running = False
+    if answer.lower() == const.ANSWER_EXIT.format(name=const.SETTINGS_MANAGER.get_settings("name")): running = False
     console.print(f"[bold blue]Jarvis: [/bold blue] {answer.capitalize()}")
     output_file: str = tts_engine.tts(answer.lower())
     sound_player.play_and_delete(output_file)

@@ -2,6 +2,8 @@ import webbrowser
 
 import requests
 
+import constants as const
+
 
 class InternetManager:
     def __init__(self) -> None:
@@ -9,7 +11,7 @@ class InternetManager:
 
     def is_connected_to_internet(self) -> bool:
         try:
-            requests.head("https://google.com", timeout=5)
+            requests.head(const.GOOGLE, timeout=5)
             return True
         except requests.ConnectionError:
             return False
